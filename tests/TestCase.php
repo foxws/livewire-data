@@ -2,8 +2,8 @@
 
 namespace Foxws\Data\Tests;
 
-use Orchestra\Testbench\TestCase as Orchestra;
 use Foxws\Data\DataServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
