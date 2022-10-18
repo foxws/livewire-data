@@ -1,15 +1,14 @@
 <?php
 
-namespace Foxws\Data\Support\Livewire;
+namespace Foxws\Data\Support;
 
 use Livewire\Wireable;
-use Spatie\LaravelData\Data;
 
 class DataTransferObject implements Wireable
 {
-    public $data = [];
+    protected array $data = [];
 
-    public function __construct(array|Data $data)
+    public function __construct(array $data = [])
     {
         $this->data = $data;
     }
@@ -21,7 +20,7 @@ class DataTransferObject implements Wireable
 
     public function __get($name): mixed
     {
-        return $this->data[$name];
+        return $this->data[$name] ?? null;
     }
 
     public function __isset($name): bool
@@ -29,7 +28,7 @@ class DataTransferObject implements Wireable
         return isset($this->data[$name]);
     }
 
-    public function toLivewire()
+    public function toLivewire(): array
     {
         return $this->data;
     }

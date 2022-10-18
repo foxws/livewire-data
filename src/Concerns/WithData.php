@@ -4,12 +4,12 @@ namespace Foxws\Data\Concerns;
 
 use Foxws\Data\Data\DataObject;
 use Foxws\Data\Exceptions\MissingProperty;
-use Foxws\Data\Support\Livewire\DataTransferObject;
+use Foxws\Data\Support\DataTransferObject;
 use Spatie\LaravelData\Data;
 
 trait WithData
 {
-    public function mountWithData(): void
+    protected function setup(): void
     {
         collect($this->data())
             ->filter(fn ($object) => $object instanceof DataObject)
