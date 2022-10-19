@@ -5,15 +5,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/foxws/livewire-data/Fix%20PHP%20code%20style%20issues?label=code%20style)](https://github.com/foxws/livewire-data/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/foxws/livewire-data.svg?style=flat-square)](https://packagist.org/packages/foxws/livewire-data)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/livewire-data.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/livewire-data)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+A Livewire wrapper for Spatie's [Laravel Data](https://github.com/spatie/laravel-data) package.
 
 ## Installation
 
@@ -23,37 +15,50 @@ You can install the package via composer:
 composer require foxws/livewire-data
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="livewire-data-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="livewire-data-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="livewire-data-views"
-```
-
 ## Usage
 
 ```php
-$data = new Foxws\Data();
-echo $data->echoPhrase('Hello, Foxws!');
+<?php
+
+use App\Models\User;
+use Foxws\Data\Data;
+use Foxws\Data\Data\DataObject;
+use Foxws\Data\Support\DataTransferObject;
+
+class UserEditController extends Data
+{
+    public DataTransferObject $user;
+
+    public DataTransferObject $post;
+
+    public function render()
+    {
+        //
+    }
+
+    protected function data(): array
+    {
+        return [
+            // Fill data-object based on model
+            DataObject::new()
+                ->name('user')
+                ->model($this->userModel()),
+
+            // Creates empty data-object
+            DataObject::new()
+                ->name('post')
+                ->data(PostData::class),
+        ];
+    }
+
+    protected function userModel(): User
+    {
+        return User::findByPrefixedIdOrFail(
+            $this->route['id']
+        );
+    }
+}
+
 ```
 
 ## Testing
@@ -76,7 +81,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [foxws](https://github.com/foxws)
+- [spatie](https://github.com/spatie)
 - [All Contributors](../../contributors)
 
 ## License
