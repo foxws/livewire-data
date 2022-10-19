@@ -37,4 +37,9 @@ class DataTransferObject implements Wireable
     {
         return new self($value);
     }
+
+    public function toArray(): array
+    {
+        return $this->data;
+    }
 }

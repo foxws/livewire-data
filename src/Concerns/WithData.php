@@ -20,7 +20,20 @@ trait WithData
     {
         throw_if(! property_exists($this, $object->name), MissingProperty::class);
 
-        data_set($this, $object->name, new DataTransferObject($this->transform($object)));
+        ! $object->model
+            ? data_set($this, $object->name, new DataTransferObject($this->create($object)))
+            : data_set($this, $object->name, new DataTransferObject($this->transform($object)));
+    }
+
+    protected function create(DataObject $object): array
+    {
+        $current = data_get($this, $object->name);
+
+        if (! $current) {
+            return app($object->data)::empty();
+        }
+
+        return $current->toArray();
     }
 
     protected function transform(DataObject $object): array
@@ -35,6 +48,6 @@ trait WithData
             ->exclude(...$object->exclude ?? [])
             ->only(...$object->only ?? [])
             ->except(...$object->except ?? [])
-            ->onlyWhen(...$object->onlyWhen ?? ['', false]);
+            ->additional($object->additional ?? []);
     }
 }
