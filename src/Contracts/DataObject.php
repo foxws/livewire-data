@@ -8,5 +8,7 @@ interface DataObject
 {
     public function name(string $name): self;
 
+    public function data(string $data): self;
+
     public function model(Model $model): self;
 }

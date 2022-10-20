@@ -5,10 +5,10 @@ namespace Foxws\Data\Exceptions;
 use Exception;
 use Foxws\Data\Contracts\DataObject;
 
-class MissingProperty extends Exception
+class MissingData extends Exception
 {
     public static function make(DataObject $object): self
     {
-        return new self("The property for `{$object->name}` has not been implemented.");
+        return new self("The data method for `{$object->name}` has not been set.");
     }
 }

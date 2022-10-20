@@ -3,8 +3,10 @@
 namespace Foxws\Data\Concerns;
 
 use Foxws\Data\Data\DataObject;
+use Foxws\Data\Exceptions\MissingData;
 use Foxws\Data\Exceptions\MissingProperty;
 use Foxws\Data\Support\DataTransferObject;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Data;
 
 trait WithData
@@ -20,25 +22,25 @@ trait WithData
     {
         throw_if(! property_exists($this, $object->name), MissingProperty::class);
 
-        ! $object->model
-            ? data_set($this, $object->name, new DataTransferObject($this->create($object)))
-            : data_set($this, $object->name, new DataTransferObject($this->transform($object)));
+        $object->model instanceof Model
+            ? data_set($this, $object->name, $this->transform($object), true)
+            : data_set($this, $object->name, $this->create($object), false);
     }
 
-    protected function create(DataObject $object): array
+    protected function create(DataObject $object): DataTransferObject
     {
-        $current = data_get($this, $object->name);
+        throw_if(! $object->data, MissingData::class);
 
-        if (! $current) {
-            return app($object->data)::empty();
-        }
-
-        return $current->toArray();
+        return new DataTransferObject(
+            call_user_func([$object->data, 'empty'])
+        );
     }
 
-    protected function transform(DataObject $object): array
+    protected function transform(DataObject $object): DataTransferObject
     {
-        return $this->getData($object)->toArray();
+        return new DataTransferObject(
+            $this->getData($object)->toArray()
+        );
     }
 
     protected function getData(DataObject $object): Data

@@ -2,44 +2,18 @@
 
 namespace Foxws\Data\Support;
 
+use Illuminate\Support\Fluent;
 use Livewire\Wireable;
 
-class DataTransferObject implements Wireable
+class DataTransferObject extends Fluent implements Wireable
 {
-    protected array $data = [];
-
-    public function __construct(array $data = [])
-    {
-        $this->data = $data;
-    }
-
-    public function __set($name, $value): void
-    {
-        $this->data[$name] = $value;
-    }
-
-    public function __get($name): mixed
-    {
-        return $this->data[$name] ?? null;
-    }
-
-    public function __isset($name): bool
-    {
-        return isset($this->data[$name]);
-    }
-
     public function toLivewire(): array
     {
-        return $this->data;
+        return $this->toArray();
     }
 
-    public static function fromLivewire($value): self
+    public static function fromLivewire($value): static
     {
         return new self($value);
-    }
-
-    public function toArray(): array
-    {
-        return $this->data;
     }
 }
