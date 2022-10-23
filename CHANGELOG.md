@@ -2,6 +2,11 @@
 
 All notable changes to `livewire-data` will be documented in this file.
 
+## 0.10.0 - 2022-10-23
+
+- code refactoring
+- use callbacks
+
 ## 0.0.3 - 2022-10-20
 
 - Use Fluent
