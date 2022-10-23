@@ -2,54 +2,49 @@
 
 namespace Foxws\Data\Concerns;
 
-use Foxws\Data\Data\DataObject;
-use Foxws\Data\Exceptions\MissingData;
-use Foxws\Data\Exceptions\MissingProperty;
+use Foxws\Data\Support\DataObject;
 use Foxws\Data\Support\DataTransferObject;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Data;
 
 trait WithData
 {
-    protected function setup(): void
+    public function bootWithData(): void
     {
-        collect($this->data())
+        if (! method_exists($this, 'data')) {
+            return;
+        }
+
+        collect($this->data()?->objects)
             ->filter(fn ($object) => $object instanceof DataObject)
-            ->each(fn (DataObject $object) => $this->setDataObject($object));
+            ->each(fn (DataObject $object) => $this->createData($object));
     }
 
-    protected function setDataObject(DataObject $object): void
+    public function mountWithData(): void
     {
-        throw_if(! property_exists($this, $object->name), MissingProperty::class);
+        if (! method_exists($this, 'data')) {
+            return;
+        }
 
-        $object->model instanceof Model
-            ? data_set($this, $object->name, $this->transform($object), true)
-            : data_set($this, $object->name, $this->create($object), false);
+        collect($this->data()?->objects)
+            ->filter(fn ($object) => $object instanceof DataObject)
+            ->each(fn (DataObject $object) => $this->setData($object));
     }
 
-    protected function create(DataObject $object): DataTransferObject
+    protected function createData(DataObject $object): void
     {
-        throw_if(! $object->data, MissingData::class);
+        throw_if(! property_exists($this, $object->property));
 
-        return new DataTransferObject(
-            call_user_func([$object->data, 'empty'])
-        );
+        data_set($this, $object->property, new DataTransferObject(), false);
     }
 
-    protected function transform(DataObject $object): DataTransferObject
+    protected function setData(DataObject $object): void
     {
-        return new DataTransferObject(
-            $this->getData($object)->toArray()
-        );
-    }
+        throw_if(! property_exists($this, $object->property));
 
-    protected function getData(DataObject $object): Data
-    {
-        return $object->model->getData()
-            ->include(...$object->includes ?? [])
-            ->exclude(...$object->exclude ?? [])
-            ->only(...$object->only ?? [])
-            ->except(...$object->except ?? [])
-            ->additional($object->additional ?? []);
+        $dto = call_user_func($object->data);
+
+        $dto instanceof Data
+            ? data_set($this, $object->property, new DataTransferObject($dto->toArray()))
+            : data_set($this, $object->property, new DataTransferObject($dto));
     }
 }

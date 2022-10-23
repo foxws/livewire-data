@@ -22,10 +22,10 @@ composer require foxws/livewire-data
 
 use App\Models\User;
 use Foxws\Data\Data;
-use Foxws\Data\Data\DataObject;
 use Foxws\Data\Support\DataTransferObject;
+use Livewire\Component;
 
-class UserEditController extends Data
+class TestComponent extends Component
 {
     public DataTransferObject $user;
 
@@ -36,26 +36,15 @@ class UserEditController extends Data
         //
     }
 
-    protected function data(): array
+    protected function data(): Data
     {
-        return [
-            // Fill data-object based on model
-            DataObject::new()
-                ->name('user')
-                ->model($this->userModel()),
+        return Data::make()
+            ->add('user', fn () => $this
+                ->findUserOrFail($this->attributes->id))
+                ->getData()
+                ->include('email'),
 
-            // Creates empty data-object
-            DataObject::new()
-                ->name('post')
-                ->data(PostData::class),
-        ];
-    }
-
-    protected function userModel(): User
-    {
-        return User::findByPrefixedIdOrFail(
-            $this->route['id']
-        );
+            ->add('post', fn () => PostData::empty());
     }
 }
 

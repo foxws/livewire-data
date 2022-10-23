@@ -2,17 +2,29 @@
 
 namespace Foxws\Data;
 
-use Foxws\Data\Concerns\WithData;
-use Livewire\Component;
+use Foxws\Data\Support\DataObject;
 
-abstract class Data extends Component
+class Data
 {
-    use WithData;
+    /** @var DataObject[] */
+    public array $objects;
 
-    public function booted(): void
+    public function __construct()
     {
-        $this->setup();
+        $this->objects = [];
     }
 
-    abstract protected function data(): array;
+    public static function make(): static
+    {
+        return app(static::class);
+    }
+
+    public function add(string $property, callable $data): self
+    {
+        $object = new DataObject($property, $data);
+
+        $this->objects[] = $object;
+
+        return $this;
+    }
 }
