@@ -10,16 +10,15 @@ trait WithData
 {
     public function bootWithData(): void
     {
-        if (! method_exists($this, 'data')) {
-            return;
-        }
-
-        collect($this->data()?->objects)
-            ->filter(fn ($object) => $object instanceof DataObject)
-            ->each(fn (DataObject $object) => $this->createData($object));
+        $this->createData();
     }
 
     public function mountWithData(): void
+    {
+        $this->setData();
+    }
+
+    protected function createData(): void
     {
         if (! method_exists($this, 'data')) {
             return;
@@ -27,17 +26,28 @@ trait WithData
 
         collect($this->data()?->objects)
             ->filter(fn ($object) => $object instanceof DataObject)
-            ->each(fn (DataObject $object) => $this->setData($object));
+            ->each(fn (DataObject $object) => $this->createDataObject($object));
     }
 
-    protected function createData(DataObject $object): void
+    protected function setData(): void
+    {
+        if (! method_exists($this, 'data')) {
+            return;
+        }
+
+        collect($this->data()?->objects)
+            ->filter(fn ($object) => $object instanceof DataObject)
+            ->each(fn (DataObject $object) => $this->setDataObject($object));
+    }
+
+    protected function createDataObject(DataObject $object): void
     {
         throw_if(! property_exists($this, $object->property));
 
         data_set($this, $object->property, new DataTransferObject(), false);
     }
 
-    protected function setData(DataObject $object): void
+    protected function setDataObject(DataObject $object): void
     {
         throw_if(! property_exists($this, $object->property));
 
