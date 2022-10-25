@@ -24,7 +24,7 @@ trait WithData
             return;
         }
 
-        collect($this->data()?->objects)
+        collect($this->data()->objects)
             ->filter(fn ($object) => $object instanceof DataObject)
             ->each(fn (DataObject $object) => $this->createDataObject($object));
     }
@@ -35,7 +35,7 @@ trait WithData
             return;
         }
 
-        collect($this->data()?->objects)
+        collect($this->data()->objects)
             ->filter(fn ($object) => $object instanceof DataObject)
             ->each(fn (DataObject $object) => $this->setDataObject($object));
     }
@@ -56,5 +56,20 @@ trait WithData
         $dto instanceof Data
             ? data_set($this, $object->property, new DataTransferObject($dto->toArray()))
             : data_set($this, $object->property, new DataTransferObject($dto));
+    }
+
+    protected function getDataObject(string $property): ?DataObject
+    {
+        return collect($this->data()->objects)
+            ->first(fn ($object) => $object instanceof DataObject && $object->property === $property);
+    }
+
+    protected function refreshDataObject(string $property): void
+    {
+        $object = $this->getDataObject($property);
+
+        if ($object) {
+            $this->setDataObject($object);
+        }
     }
 }
