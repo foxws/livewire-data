@@ -20,6 +20,11 @@ trait WithData
 
     public function mountWithData(): void
     {
+        $this->setData();
+    }
+
+    protected function createData(): void
+    {
         if (! method_exists($this, 'data')) {
             return;
         }
@@ -28,7 +33,18 @@ trait WithData
             ->each(fn (DataObject $object) => $this->transformData($object));
     }
 
-    protected function createData(DataObject $object): void
+    protected function setData(): void
+    {
+        if (! method_exists($this, 'data')) {
+            return;
+        }
+
+        collect($this->data()?->objects)
+            ->filter(fn ($object) => $object instanceof DataObject)
+            ->each(fn (DataObject $object) => $this->setDataObject($object));
+    }
+
+    protected function createDataObject(DataObject $object): void
     {
         throw_if(! property_exists($this, $object->name), InvalidDataTransferObject::make($object->name));
 
