@@ -2,6 +2,10 @@
 
 All notable changes to `livewire-data` will be documented in this file.
 
+## 0.11.0 - 2022-10-25
+
+- Move to `createData` and `setData`
+
 ## 0.10.0 - 2022-10-23
 
 - code refactoring
