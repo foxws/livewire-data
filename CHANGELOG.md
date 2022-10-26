@@ -2,6 +2,11 @@
 
 All notable changes to `livewire-data` will be documented in this file.
 
+## 0.12.0 - 2022-10-26
+
+- Add refreshDataObject method
+- Use data collection
+
 ## 0.11.0 - 2022-10-25
 
 - Move to `createData` and `setData`
