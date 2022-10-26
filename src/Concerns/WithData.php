@@ -74,7 +74,7 @@ trait WithData
     protected function findDataObject(string $property): ?DataObject
     {
         return $this->data->first(
-            fn ($object) => $object instanceof DataObject && $object->property === $property
+            fn ($object) => $object->property === $property
         );
     }
 
