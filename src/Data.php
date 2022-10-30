@@ -11,7 +11,7 @@ class Data
     /** @var array<int, DataObject> */
     protected array $data = [];
 
-    /** @param  array<int, DataObject>  $data */
+    /** @param array<int, DataObject> $data */
     public function dataObjects(array $data): self
     {
         $this->ensureDataObjectInstances($data);

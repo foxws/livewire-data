@@ -8,8 +8,6 @@ use Foxws\Data\Support\DataTransferObject;
 
 trait WithData
 {
-    protected Collection $data;
-
     public function bootWithData(): void
     {
         if (! method_exists($this, 'data')) {
@@ -17,39 +15,27 @@ trait WithData
         }
 
         collect($this->data())
-            ->each(fn (DataObject $object) => $this->createData($object));
+            ->each(fn (DataObject $object) => $this->bootDataObject($object));
     }
 
     public function mountWithData(): void
-    {
-        $this->setDataObjects();
-    }
-
-    protected function createDataObjects(): void
     {
         if (! method_exists($this, 'data')) {
             return;
         }
 
         collect($this->data())
-            ->each(fn (DataObject $object) => $this->transformData($object));
+            ->each(fn (DataObject $object) => $this->transformDataObject($object));
     }
 
-    protected function setDataObjects(): void
-    {
-        $this->data->each(
-            fn (DataObject $object) => $this->setDataObject($object)
-        );
-    }
-
-    protected function createDataObject(DataObject $object): void
+    protected function bootDataObject(DataObject $object): void
     {
         throw_if(! property_exists($this, $object->name), InvalidDataTransferObject::make($object->name));
 
         data_set($this, $object->name, new DataTransferObject(), false);
     }
 
-    protected function transformData(DataObject $object): void
+    protected function transformDataObject(DataObject $object): void
     {
         throw_if(! property_exists($this, $object->name), InvalidDataTransferObject::make($object->name));
 
@@ -67,23 +53,7 @@ trait WithData
         $object = $this->findDataObject($property);
 
         if ($object) {
-            $this->transformData($object);
-        }
-    }
-
-    protected function findDataObject(string $property): ?DataObject
-    {
-        return $this->data->first(
-            fn ($object) => $object->property === $property
-        );
-    }
-
-    protected function refreshDataObject(string $property): void
-    {
-        $object = $this->findDataObject($property);
-
-        if ($object) {
-            $this->setDataObject($object);
+            $this->transformDataObject($object);
         }
     }
 }
