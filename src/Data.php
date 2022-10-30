@@ -11,7 +11,7 @@ class Data
     /** @var array<int, DataObject> */
     protected array $data = [];
 
-    /** @param array<int, DataObject> $data */
+    /** @param  array<int, DataObject>  $data */
     public function data(array $data): self
     {
         $this->ensureCheckInstances($data);
@@ -36,7 +36,7 @@ class Data
         return collect($this->data);
     }
 
-    /** @param  array<int,mixed> $data */
+    /** @param  array<int,mixed>  $data */
     protected function ensureCheckInstances(array $data): void
     {
         foreach ($data as $dataObject) {
