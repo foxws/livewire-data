@@ -18,14 +18,4 @@ class TestCase extends Orchestra
             DataServiceProvider::class,
         ];
     }
-
-    public function getEnvironmentSetUp($app)
-    {
-        config()->set('database.default', 'testing');
-
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_livewire-data_table.php.stub';
-        $migration->up();
-        */
-    }
 }
