@@ -9,9 +9,13 @@ class EmptyDataObject extends DataObject
 {
     protected ?Data $data = null;
 
-    public function data(string $data): self
+    protected ?array $extra = null;
+
+    public function data(string $data, array $extra = null): self
     {
         $this->data = $data;
+
+        $this->extra = $extra;
 
         return $this;
     }
@@ -19,7 +23,7 @@ class EmptyDataObject extends DataObject
     public function transform(): DataTransferObject
     {
         return new DataTransferObject(
-            $this->data->empty()
+            $this->data->empty($this->extra)
         );
     }
 }

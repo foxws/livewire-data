@@ -2,9 +2,9 @@
 
 namespace Foxws\Data\Concerns;
 
-use Foxws\Data\Support\DataObject;
+use Foxws\Data\DataObjects\DataObject;
+use Foxws\Data\Exceptions\InvalidDataTransferObject;
 use Foxws\Data\Support\DataTransferObject;
-use Spatie\LaravelData\Data;
 
 trait WithData
 {
@@ -14,8 +14,7 @@ trait WithData
             return;
         }
 
-        collect($this->data()?->objects)
-            ->filter(fn ($object) => $object instanceof DataObject)
+        collect($this->data())
             ->each(fn (DataObject $object) => $this->createData($object));
     }
 
@@ -25,26 +24,36 @@ trait WithData
             return;
         }
 
-        collect($this->data()?->objects)
-            ->filter(fn ($object) => $object instanceof DataObject)
-            ->each(fn (DataObject $object) => $this->setData($object));
+        collect($this->data())
+            ->each(fn (DataObject $object) => $this->transformData($object));
     }
 
     protected function createData(DataObject $object): void
     {
-        throw_if(! property_exists($this, $object->property));
+        throw_if(! property_exists($this, $object->name), InvalidDataTransferObject::make($object->name));
 
-        data_set($this, $object->property, new DataTransferObject(), false);
+        data_set($this, $object->name, new DataTransferObject(), false);
     }
 
-    protected function setData(DataObject $object): void
+    protected function transformData(DataObject $object): void
     {
-        throw_if(! property_exists($this, $object->property));
+        throw_if(! property_exists($this, $object->name), InvalidDataTransferObject::make($object->name));
 
-        $dto = call_user_func($object->data);
+        data_set($this, $object->name, $object->transform());
+    }
 
-        $dto instanceof Data
-            ? data_set($this, $object->property, new DataTransferObject($dto->toArray()))
-            : data_set($this, $object->property, new DataTransferObject($dto));
+    protected function findDataObject(string $property): ?DataObject
+    {
+        return collect($this->data())
+            ->first(fn ($object) => $object->property === $property);
+    }
+
+    protected function refreshDataObject(string $property): void
+    {
+        $object = $this->findDataObject($property);
+
+        if ($object) {
+            $this->transformData($object);
+        }
     }
 }

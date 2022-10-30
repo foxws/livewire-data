@@ -2,58 +2,52 @@
 
 namespace Foxws\Data;
 
-use Foxws\Data\Exceptions\InvalidData;
-use Foxws\Data\Support\DataObject;
-use Illuminate\Support\Collection;
+use Foxws\Data\DataObjects\DataObject;
+use Foxws\Data\Exceptions\DuplicatedDataObjects;
+use Foxws\Data\Exceptions\InvalidDataObject;
 
 class Data
 {
     /** @var array<int, DataObject> */
     protected array $data = [];
 
-    /** @param  array<int, DataObject>  $data */
-    public function data(array $data): self
+    /** @param array<int, DataObject> $data */
+    public function dataObjects(array $data): self
     {
-        $this->ensureCheckInstances($data);
+        $this->ensureDataObjectInstances($data);
 
         $this->data = array_merge($this->data, $data);
 
-        $this->guardAgainstDuplicateCheckNames();
+        $this->guardAgainstDuplicateDataObjectNames();
 
         return $this;
     }
 
-    public function clearObjects(): self
+    public function clearDataObjects(): self
     {
         $this->data = [];
 
         return $this;
     }
 
-    /** @return Collection<int, DataObject> */
-    public function registeredObjects(): Collection
-    {
-        return collect($this->data);
-    }
-
     /** @param  array<int,mixed>  $data */
-    protected function ensureCheckInstances(array $data): void
+    protected function ensureDataObjectInstances(array $data): void
     {
         foreach ($data as $dataObject) {
-            if (! $dataObject instanceof Check) {
-                throw InvalidData::doesNotExtendData($dataObject);
+            if (! $dataObject instanceof DataObject) {
+                throw InvalidDataObject::doesNotExtendData($dataObject);
             }
         }
     }
 
-    protected function guardAgainstDuplicateCheckNames(): void
+    protected function guardAgainstDuplicateDataObjectNames(): void
     {
-        $duplicateCheckNames = collect($this->data)
-            ->map(fn (Check $check) => $check->getName())
+        $duplicateDataObjectNames = collect($this->data)
+            ->map(fn (DataObject $dataObject) => $dataObject->getName())
             ->duplicates();
 
-        if ($duplicateCheckNames->isNotEmpty()) {
-            throw DuplicateCheckNamesFound::make($duplicateCheckNames);
+        if ($duplicateDataObjectNames->isNotEmpty()) {
+            throw DuplicatedDataObjects::make($duplicateDataObjectNames);
         }
     }
 }

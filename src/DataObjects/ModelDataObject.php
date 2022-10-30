@@ -12,7 +12,7 @@ class ModelDataObject extends DataObject
 
     protected ?Closure $callback = null;
 
-    public function model(string $model, ?callable $callback = null): self
+    public function model(string $model, callable $callback = null): self
     {
         $this->model = $model;
 
