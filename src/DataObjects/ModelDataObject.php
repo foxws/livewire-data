@@ -25,8 +25,8 @@ class ModelDataObject extends DataObject
     {
         return new DataTransferObject(
             $this->callback instanceof Closure
-                ? $this->model->getData()($this->callback)
-                : $this->model->getData()
+                ? $this->model->getData()($this->callback)->toArray()
+                : $this->model->getData()->toArray()
         );
     }
 }
